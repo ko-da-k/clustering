@@ -1,5 +1,7 @@
-# clustering
-irisデータで階層的クラスタリング
+# Hierarchical Agglomerative Clustering
+sample codes
+Dataset : iris dataset (sklearn.datasets)
+env : ``Python 3.5.1 :: Anaconda 2.5.0 (x86_64)``
 
 
 ``hac = HAC(iris.data, iris.target)``
