@@ -7,44 +7,13 @@
 クラスタの分布とかデータの内訳を返す
 """
 
+import sys
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster, cophenet, ward
 from scipy.spatial.distance import pdist
+import matplotlib.pyplot as plt
 import seaborn as sns
-
-
-def view_breakdown(label: np.ndarray, pred: np.ndarray, kind: str = "bar", name: str = False) -> pd.DataFrame:
-    """
-    クラスタリングやクラス分類結果の内訳を表示
-    :param label: もとのラベル
-    :param pred: 結果
-    :param kind: bar or barh
-    :return: 内訳のdf
-    """
-    df_index = sorted(list(set(pred)), key=int)
-    df_columns = sorted(list(set(label)))
-    report = pd.DataFrame(index=df_index, columns=df_columns).fillna(0)
-
-    for i in range(0, len(pred)):
-        report.ix[pred[i], label[i]] += 1
-    print(report)
-    ratio = (report / report.sum())
-    ratio.plot(kind=kind)
-    if kind == 'bar':
-        plt.ylim(0, 1)
-        plt.ylabel("Proportion")
-        plt.xlabel("Cluster ID")
-    else:
-        plt.xlim(0, 1)
-        plt.xlabel("Proportion")
-        plt.ylabel("cluster ID")
-    if name is not False:
-        plt.savefig(name)
-    plt.show()
-
-    return report
+from tools import sort_smart, view_breakdown
 
 
 def fancy_dendrogram(*args, **kwargs):
@@ -101,14 +70,15 @@ class HAC:
         c, coph_dists = cophenet(self.Z, self.distance)
         print("Cophenetic Correlation Coefficient: ", c)
 
-    def clustering(self, n: int = 6, name: str = False, kind: str ='bar'):
+    def clustering(self, n: int = 6, name: str = False, kind: str ='bar', isplot: bool = True):
         """
         :param n: クラスタ数
         :param name: 結果ファイルの保存名
         :param kind: グラフの可視化方法
+        :param isplot: 可視化するかしないか
         """
         self.pred = fcluster(self.Z, n, criterion="maxclust")
-        self.report = view_breakdown(self.label, self.pred, kind=kind)
+        self.report = view_breakdown(self.label, self.pred, kind=kind, isplot=isplot)
 
     def draw_dendrogram(self, name: str = False, **kwargs):
         """
